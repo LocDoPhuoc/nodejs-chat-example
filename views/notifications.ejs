@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Real time web demo - Notifications</title>
+        <!-- Jquery -->
+        <script src="js/jquery.min.js"></script>
+        <!-- Socket.io -->
+        <script src="socket.io/socket.io.js"></script>
+
+        <style>
+            #notifications {
+                list-style: none;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Notifications</h1>
+        <ul id="notifications"></ul>
+    </body>
+    <script>
+        $(document).ready(function(){
+            var socket = io();
+            socket.on("notifications", function(notification) {
+                $("#notifications").append("<li>" + notification +"</li>");
+            });
+        });
+    </script>
+</html>

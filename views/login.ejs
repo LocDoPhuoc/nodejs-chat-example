@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>NodeChat :)</title>
+        <!-- Jquery -->
+        <script src="js/jquery.min.js"></script>
+        <!-- Socket.io -->
+        <script src="socket.io/socket.io.js"></script>
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="css/boostrap.min.css">
+        <script src="js/popper.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+
+        <style>
+            .container {
+                margin-top: 50px;
+            }
+            #messages {
+                list-style: none;
+            }
+            .hidden {
+                display: none;
+            }
+            ul {
+                list-style: none;
+            }
+            /* .btn-send-message{
+                margin-top: 25px;
+            } */
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <!-- Alert -->
+                <div id="alert-success" class="alert alert-success alert-dismissible fade show hidden" role="alert">
+                    <span class="alert-content"></span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- Login form -->
+                <div class="login-form col-lg-6 offset-lg-3">
+                    <h1>Register</h1>
+                    <div id="error-message" class="alert alert-danger hidden" role="alert"></div>
+                    <form>
+                        <div class="form-group">
+                            <label for="name">User name</label>
+                            <input type="text" class="form-control" id="name" placeholder="Enter user name">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </form>
+                </div>
+            </div>
+            
+           <!-- Main content -->
+            <div class="main-content row hidden">
+                <!-- Messages -->
+                <div class="col-lg-9 message-list-wrapper">
+                    <div class="card border-primary">
+                        <h5 class="card-header text-white bg-primary">Message</h5>
+                        <div class="card-body">
+                            <ul id="messages">
+                                There is no message
+                            </ul>
+                            
+                            <form class="message-form">
+                                <input type="text" class="form-control" name="message" placeholder="Enter new message">
+                                <button class="btn btn-primary pull-right btn-send-message" type="submit">Send</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users -->
+                <div class="col-lg-3 user-list-wrapper">
+                    <div class="card border-success">
+                        <h5 class="card-header text-white bg-success">User online</h5>
+                        <div class="card-body">
+                            <ul id="users"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        function reloadUserList(users){
+            var userListHtml = "";
+            users.forEach(element => {
+                userListHtml += "<li>" + element + "</li>";
+            });
+            $("#users").html(userListHtml);
+        };
+
+        $(document).ready(function(){
+            var socket = io();
+            $(".login-form").submit(function(e) {
+                e.preventDefault();
+                var nameInput = $("#name");
+                if(nameInput.val() == '') {
+                    return false;
+                }
+                socket.emit("login", nameInput.val());
+                nameInput.val('');
+            });
+
+            socket.on("login-fail", function(message) {
+                $("#error-message").removeClass("hidden");
+                $("#error-message").html(message);
+            });
+
+            socket.on("login-success", function(users) {
+                // Reset and hidden login form
+                $("#name").val("");
+                $(".login-form").addClass("hidden");
+
+                // Show message list and user online list
+                $(".main-content").removeClass("hidden");
+                // Reload user online list
+                reloadUserList(users);
+            });
+
+            socket.on("a-new-user-online", function(data) {
+                $("#alert-success").removeClass("hidden");
+                $("#alert-success .alert-content").html(data.notification)
+
+                // Reload user online list
+                reloadUserList(data.users);
+            });
+        });
+    </script>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Real time web demo - Support</title>
+        <!-- Jquery -->
+        <script src="js/jquery.min.js"></script>
+        <!-- Socket.io -->
+        <script src="socket.io/socket.io.js"></script>
+
+        <style>
+            #messages {
+                list-style: none;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Support</h1>
+        <ul id="messages"></ul>
+        <form id="message-box">
+            <input type="text" name="message" placeholder="Enter your message"/>
+            <button type="submit">Send</button>
+        </form>
+    </body>
+    <script>
+        $(document).ready(function(){
+            var socket = io();
+            $("#message-box").submit(function(e) {
+                e.preventDefault();
+                var messageInput = $("input[name='message']");
+                if(messageInput.val() == '') {
+                    return false;
+                }
+                socket.emit("send-support-message", messageInput.val());
+                messageInput.val('');
+            });
+
+            socket.on("reply-support-message", function(message) {
+                $("#messages").append("<li>" + message +"</li>");
+            });
+        });
+    </script>
+</html>

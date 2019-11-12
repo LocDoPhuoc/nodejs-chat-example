@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>NodeChat - Login</title>
+        <!-- Jquery -->
+        <script src="js/jquery.min.js"></script>
+        <!-- Socket.io -->
+        <script src="socket.io/socket.io.js"></script>
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="css/boostrap.min.css">
+        <script src="js/popper.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+
+        <style>
+            #messages {
+                list-style: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="login-form col-lg-6 offset-lg-3">
+                    <h1>Login</h1>
+                    <form>
+                        <div class="form-group">
+                            <label for="name">User name</label>
+                            <input type="text" class="form-control" id="name" placeholder="Enter user name">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+                    <!-- <% if (false) { %>
+                        <h1>Message</h1>
+                        <ul id="messages"></ul>
+                        <% } %>
+            
+                        
+                        
+                        <% if (false) { %>
+                        <form id="message-box" class="form">
+                            <input type="text" name="message" placeholder="Enter your message"/>
+                            <button type="submit">Send</button>
+                        </form>
+                        <% } %> -->
+            </div>
+        </div>
+    </body>
+    <script>
+        $(document).ready(function(){
+            var socket = io();
+            $("#message-box").submit(function(e) {
+                e.preventDefault();
+                var messageInput = $("input[name='message']");
+                if(messageInput.val() == '') {
+                    return false;
+                }
+                socket.emit("send-message", messageInput.val());
+                messageInput.val('');
+            });
+
+            socket.on("chat-message", function(message) {
+                $("#messages").append("<li>" + message +"</li>");
+            });
+        });
+    </script>
+</html>

@@ -62,9 +62,7 @@
                     <div class="card border-primary">
                         <h5 class="card-header text-white bg-primary">Message</h5>
                         <div class="card-body">
-                            <ul id="messages">
-                                There is no message
-                            </ul>
+                            <ul id="messages"></ul>
                             
                             <form class="message-form">
                                 <input type="text" class="form-control" name="message" placeholder="Enter new message">
@@ -130,6 +128,18 @@
                 // Reload user online list
                 reloadUserList(data.users);
             });
+
+            $(".message-form").submit(function(e){
+                e.preventDefault();
+                var inputMessage = $("input[name='message']");
+                socket.emit("send-message", inputMessage.val());
+                inputMessage.val("");
+            });
+
+            socket.on("chat-message", function(message){
+                // $("#messages").html('');
+                $("#messages").append("<li>"+ message + "</li>");
+            })
         });
     </script>
 </html>

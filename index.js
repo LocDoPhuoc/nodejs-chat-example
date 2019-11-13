@@ -25,6 +25,7 @@ io.on("connection", (socket) => {
         }
         else {
             users.push(username);
+            socket.username = username;
             // Only emit login success event to user has been logged.
             socket.emit("login-success", users);
             // Emit new user online to all user, except user has been logged.
@@ -40,15 +41,14 @@ io.on("connection", (socket) => {
         // Emit to all user
         // or we can use io.emit
         // io.emit("chat-message", message);
-        io.sockets.emit("chat-message", message);
+        io.sockets.emit("chat-message", socket.username + ": " + message);
 
         // Send notification to another user, except user send message
-        socket.broadcast.emit("notifications", "You have a new message");
+        // socket.broadcast.emit("notifications", "You have a new message");
     });
 
     // Listen event 'send-support-message'
     socket.on("send-support-message", (supportMessage) => {
-        console.log(socket.id + ": " + supportMessage);
         $message = "Your message is: " + supportMessage + ". We are processing...";
         // Only emit to user send support message
         socket.emit("reply-support-message", $message);
@@ -63,15 +63,3 @@ io.on("connection", (socket) => {
 app.get("/", (req, res) => {
     res.render("login");
 });
-
-// app.get("/support", (req, res) => {
-//     res.render("support");
-// });
-
-// app.get("/notifications", (req, res) => {
-//     res.render("notifications");
-// });
-
-// app.listen(3000, () => {
-//     console.log("Server running at http://127.0.0.1:3000");
-// });
